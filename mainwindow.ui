@@ -739,6 +739,43 @@ QStatusBar QLabel {
                </property>
               </spacer>
              </item>
+             <item alignment="Qt::AlignmentFlag::AlignHCenter">
+              <widget class="QToolButton" name="icon_9">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                </font>
+               </property>
+               <property name="acceptDrops">
+                <bool>true</bool>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/icons/icons/no_chart.png</normaloff>:/icons/icons/no_chart.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>187</width>
+                 <height>197</height>
+                </size>
+               </property>
+               <property name="autoRaise">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
              <item>
               <widget class="QLabel" name="chartEmptyTitleLabel">
                <property name="font">

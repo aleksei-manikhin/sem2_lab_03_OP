@@ -10,5 +10,6 @@
         <file>icons/selectFile.svg</file>
         <file>icons/table.svg</file>
         <file>icons/info.svg</file>
+        <file>icons/no_chart.png</file>
     </qresource>
 </RCC>
