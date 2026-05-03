@@ -4,6 +4,7 @@
 #include <QClipboard>
 #include <QColor>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QDropEvent>
 #include <QEvent>
 #include <QFileDialog>
@@ -552,10 +553,12 @@ void MainWindow::fillTableRow(int row, const DemographyRecord* record, const QSt
 }
 
 void MainWindow::chooseFileClicked() {
+    QString projectFilesPath = QCoreApplication::applicationDirPath()
+                               + "/../../../files_for_selecting";
     QString fileName = QFileDialog::getOpenFileName(
         this,
         "Select CSV file",
-        QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
+        projectFilesPath,
         "CSV Files (*.csv);;All Files (*)");
 
     selectFile(fileName);
