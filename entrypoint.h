@@ -11,7 +11,7 @@ extern "C" {
 typedef enum {
   INITIALIZE,
   LOAD_DATA,
-  CALCULATE_METRICS,
+  CALCULATE_AND_DRAW,
   DISPOSE
 } Operation;
 

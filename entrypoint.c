@@ -12,7 +12,7 @@ void doOperation(Operation operation, AppContext* context, const AppParams* para
       loadData(context, params->str);
       break;
 
-    case CALCULATE_METRICS:
+    case CALCULATE_AND_DRAW:
       calculateMetricsForRegion(context, params->str, params->column);
       break;
 

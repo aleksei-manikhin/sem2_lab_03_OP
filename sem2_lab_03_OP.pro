@@ -9,6 +9,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    chart_data.c \
     entrypoint.c \
     file_loader.c \
     iterator.c \
@@ -21,6 +22,7 @@ SOURCES += \
 
 HEADERS += \
     appcontext.h \
+    chart_data.h \
     demography_record.h \
     entrypoint.h \
     file_loader.h \

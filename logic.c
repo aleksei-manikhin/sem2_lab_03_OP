@@ -43,6 +43,7 @@ Status loadAndCheckData(AppContext* context, const char* filePath) {
 void initContext(AppContext* context) {
   if (context != NULL) {
     context->list = NULL;
+    context->chartPoints = NULL;
     clearParseInfo(&context->parseInfo);
     clearMetrics(&context->metrics);
     context->status = OK;
@@ -54,6 +55,10 @@ void disposeContext(AppContext* context) {
     if (context->list != NULL) {
       disposeList(context->list);
       context->list = NULL;
+    }
+    if (context->chartPoints != NULL) {
+      disposeList(context->chartPoints);
+      context->chartPoints = NULL;
     }
     clearParseInfo(&context->parseInfo);
     clearMetrics(&context->metrics);
@@ -72,6 +77,8 @@ Status loadData(AppContext* context, const char* filePath) {
     status = prepareListForLoad(context);
     clearParseInfo(&context->parseInfo);
     clearMetrics(&context->metrics);
+    if (context->chartPoints != NULL)
+      clearList(context->chartPoints);
     if (status == OK)
       status = loadAndCheckData(context, filePath);
 

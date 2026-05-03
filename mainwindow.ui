@@ -131,6 +131,40 @@ QStackedWidget#contentStackedWidget {
     border-radius: 14px;
 }
 
+QFrame#chartFrame {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #f4f8ff, stop:1 #f6f4fa);
+    border: 1px solid #d8dfeb;
+    border-radius: 14px;
+}
+
+QStackedWidget#ChartStackedWidget,
+QWidget#chartEmptyPage,
+QWidget#chartPage {
+    background: transparent;
+    border: none;
+}
+
+QLabel#chartLabel {
+    background: transparent;
+    border: none;
+}
+
+QLabel#chartEmptyTitleLabel {
+    color: #2f3d50;
+    font-family: &quot;Segoe UI&quot;;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+QLabel#chartEmptyTextLabel {
+    color: #3a4b61;
+    font-family: &quot;Segoe UI&quot;;
+    font-size: 20px;
+    font-weight: 500;
+    padding: 4px 28px;
+}
+
 QWidget#emptyPage {
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                                 stop:0 #f4f8ff, stop:1 #f6f4fa);
@@ -709,7 +743,9 @@ QStatusBar QLabel {
               <widget class="QLabel" name="chartEmptyTitleLabel">
                <property name="font">
                 <font>
-                 <pointsize>16</pointsize>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <bold>true</bold>
                 </font>
                </property>
                <property name="text">
@@ -730,11 +766,13 @@ QStatusBar QLabel {
                </property>
                <property name="font">
                 <font>
-                 <pointsize>16</pointsize>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <fontweight>Medium</fontweight>
                 </font>
                </property>
                <property name="text">
-                <string>Select file, then click &quot;Calculate and Draw&quot;</string>
+                <string>Select file, choose region and column, then click &quot;Calculate and Draw&quot;</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignmentFlag::AlignCenter</set>

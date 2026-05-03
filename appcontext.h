@@ -33,6 +33,7 @@ typedef struct {
 
 typedef struct {
     List* list;
+    List* chartPoints;
     RowCounts parseInfo;
     Status status;
     Metrics metrics;

@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QClipboard>
+#include <QColor>
 #include <QComboBox>
 #include <QDropEvent>
 #include <QEvent>
@@ -13,12 +14,142 @@
 #include <QLineEdit>
 #include <QMimeData>
 #include <QMessageBox>
+#include <QPainter>
+#include <QPen>
+#include <QPaintDevice>
+#include <QPixmap>
+#include <QPoint>
+#include <QRect>
+#include <QSizePolicy>
 #include <QStatusBar>
 #include <QStandardPaths>
 #include <QTableWidgetItem>
 #include <QUrl>
 
 #include <string>
+
+enum {
+    CHART_WIDTH = 760,
+    CHART_HEIGHT = 460,
+    CHART_LEFT = 70,
+    CHART_TOP = 35,
+    CHART_RIGHT = 30,
+    CHART_BOTTOM = 55,
+    CHART_POINT_RADIUS = 4,
+    CHART_SCALE_PADDING_PERCENT = 8,
+    CHART_AXIS_FONT_SIZE = 13,
+    CHART_METRIC_FONT_SIZE = 12
+};
+
+QSize chartPixmapSize(const QLabel* label);
+double paddedMin(double minValue, double maxValue);
+double paddedMax(double minValue, double maxValue);
+QPoint chartPointToScreen(const ChartPoint* point, const QRect& area,
+                          int minYear, int maxYear, double minValue, double maxValue);
+void drawChartAxes(QPainter* painter, const QRect& area,
+                   int minYear, int maxYear, double minValue, double maxValue);
+void drawChartPolyline(QPainter* painter, const List* points, const QRect& area,
+                       int minYear, int maxYear, double minValue, double maxValue);
+void drawMetricLine(QPainter* painter, const QRect& area, double value,
+                    double minValue, double maxValue, const QString& label);
+void drawChartMetrics(QPainter* painter, const QRect& area,
+                      const Metrics* metrics, double minValue, double maxValue);
+
+QSize chartPixmapSize(const QLabel* label) {
+    QSize size = label->size();
+
+    if (size.width() < CHART_WIDTH)
+        size.setWidth(CHART_WIDTH);
+    if (size.height() < CHART_HEIGHT)
+        size.setHeight(CHART_HEIGHT);
+
+    return size;
+}
+
+double paddedMin(double minValue, double maxValue) {
+    double span = maxValue - minValue;
+    double padding = span == 0.0 ? 1.0 : span * CHART_SCALE_PADDING_PERCENT / 100.0;
+
+    return minValue - padding;
+}
+
+double paddedMax(double minValue, double maxValue) {
+    double span = maxValue - minValue;
+    double padding = span == 0.0 ? 1.0 : span * CHART_SCALE_PADDING_PERCENT / 100.0;
+
+    return maxValue + padding;
+}
+
+QPoint chartPointToScreen(const ChartPoint* point, const QRect& area,
+                          int minYear, int maxYear, double minValue, double maxValue) {
+    double yearSpan = maxYear - minYear;
+    double valueSpan = maxValue - minValue;
+    double xRate = yearSpan == 0.0 ? 0.5 : (point->year - minYear + 0.5) / (yearSpan + 1.0);
+    double yRate = valueSpan == 0.0 ? 0.5 : (point->value - minValue) / valueSpan;
+
+    return QPoint(area.left() + xRate * area.width(),
+                  area.bottom() - yRate * area.height());
+}
+
+void drawChartAxes(QPainter* painter, const QRect& area,
+                   int minYear, int maxYear, double minValue, double maxValue) {
+    QFont font = painter->font();
+
+    font.setPointSize(CHART_AXIS_FONT_SIZE);
+    font.setBold(true);
+    painter->setFont(font);
+    painter->setPen(QPen(QColor("#253247"), 2));
+    painter->drawLine(area.bottomLeft(), area.bottomRight());
+    painter->drawLine(area.bottomLeft(), area.topLeft());
+    painter->drawText(area.left(), area.bottom() + 25, QString::number(minYear));
+    painter->drawText(area.right() - 35, area.bottom() + 25, QString::number(maxYear));
+    painter->drawText(12, area.top() + 5, QString::number(maxValue, 'f', 2));
+    painter->drawText(12, area.bottom(), QString::number(minValue, 'f', 2));
+    painter->drawText(area.center().x() - 20, area.bottom() + 45, "Year");
+    painter->drawText(area.left() - 55, area.top() - 12, "Value");
+}
+
+void drawChartPolyline(QPainter* painter, const List* points, const QRect& area,
+                       int minYear, int maxYear, double minValue, double maxValue) {
+    Iterator it = begin(points);
+    QPoint prevPoint;
+    int hasPrevPoint = 0;
+
+    painter->setPen(QPen(QColor("#1d4fc0"), 3));
+    while (isSet(&it)) {
+        ChartPoint* chartPoint = (ChartPoint*)get(&it);
+        QPoint screenPoint = chartPointToScreen(chartPoint, area, minYear, maxYear, minValue, maxValue);
+        if (hasPrevPoint)
+            painter->drawLine(prevPoint, screenPoint);
+        painter->setBrush(QColor("#17c2c2"));
+        painter->drawEllipse(screenPoint, CHART_POINT_RADIUS, CHART_POINT_RADIUS);
+        prevPoint = screenPoint;
+        hasPrevPoint = 1;
+        next(&it);
+    }
+}
+
+void drawMetricLine(QPainter* painter, const QRect& area, double value,
+                    double minValue, double maxValue, const QString& label) {
+    double valueSpan = maxValue - minValue;
+    double yRate = valueSpan == 0.0 ? 0.5 : (value - minValue) / valueSpan;
+    int y = area.bottom() - yRate * area.height();
+    QFont font = painter->font();
+
+    font.setPointSize(CHART_METRIC_FONT_SIZE);
+    font.setBold(true);
+    painter->setFont(font);
+    painter->setPen(QPen(QColor("#c73535"), 1, Qt::DashLine));
+    painter->drawLine(area.left(), y, area.right(), y);
+    painter->drawText(area.left() + 8, y - 4, label + ": " + QString::number(value, 'f', 2));
+}
+
+void drawChartMetrics(QPainter* painter, const QRect& area,
+                      const Metrics* metrics, double minValue, double maxValue) {
+    drawMetricLine(painter, area, metrics->min, minValue, maxValue, "Min");
+    drawMetricLine(painter, area, metrics->median, minValue, maxValue, "Median");
+    drawMetricLine(painter, area, metrics->max, minValue, maxValue, "Max");
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -30,6 +161,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     doOperation(INITIALIZE, &context, nullptr);
     setupTable();
+    setupChart();
     setupColumnComboBox();
     setupRegionComboBox();
     setupConnections();
@@ -141,6 +273,10 @@ void MainWindow::setupConnections() {
     connect(ui->calculateMetricsButton, &QPushButton::clicked, this, &MainWindow::calculateMetricsClicked);
     connect(ui->regionComboBox, QOverload<int>::of(&QComboBox::activated),this, &MainWindow::regionEditingFinished);
     connect(ui->regionComboBox->lineEdit(), &QLineEdit::editingFinished,this, &MainWindow::regionEditingFinished);
+    connect(ui->columnComboBox, QOverload<int>::of(&QComboBox::activated), this, [this]() {
+        clearMetricFields();
+        clearChart();
+    });
     connect(ui->tableWidget, &QTableWidget::itemDoubleClicked, this, &MainWindow::tableItemDoubleClicked);
 }
 
@@ -163,6 +299,13 @@ void MainWindow::setupTable() {
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableWidget->setHorizontalHeaderLabels(
         {"Year", "Region", "Growth", "Birth", "Death", "Weight", "Urban"});
+}
+
+void MainWindow::setupChart() {
+    ui->chartLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    ui->chartLabel->setScaledContents(true);
+    ui->chartLabel->setMinimumSize(440, 320);
+    clearChart();
 }
 
 void MainWindow::setupColumnComboBox() {
@@ -227,6 +370,7 @@ void MainWindow::unloadData() {
     reloadRegionComboBox();
     setLoadedState();
     clearMetricFields();
+    clearChart();
 }
 
 
@@ -251,6 +395,62 @@ void MainWindow::clearMetricFields() {
     ui->minValueLineEdit->clear();
     ui->medianValueLineEdit->clear();
     ui->maxValueLineEdit->clear();
+}
+
+void MainWindow::clearChart() {
+    ui->chartLabel->clear();
+    ui->ChartStackedWidget->setCurrentWidget(ui->chartEmptyPage);
+}
+
+int MainWindow::chartDataBounds(int* minYear, int* maxYear, double* minValue, double* maxValue) const {
+    Iterator it = begin(context.chartPoints);
+    int hasPoints = 0;
+
+    while (isSet(&it)) {
+        ChartPoint* point = (ChartPoint*)get(&it);
+        if (!hasPoints || point->year < *minYear)
+            *minYear = point->year;
+        if (!hasPoints || point->year > *maxYear)
+            *maxYear = point->year;
+        if (!hasPoints || point->value < *minValue)
+            *minValue = point->value;
+        if (!hasPoints || point->value > *maxValue)
+            *maxValue = point->value;
+        hasPoints = 1;
+        next(&it);
+    }
+
+    return hasPoints;
+}
+
+void MainWindow::drawChart() {
+    int minYear = 0;
+    int maxYear = 0;
+    double minValue = 0.0;
+    double maxValue = 0.0;
+    QSize pixmapSize = chartPixmapSize(ui->chartLabel);
+    double ratio = ui->chartLabel->devicePixelRatioF();
+    QPixmap pixmap(pixmapSize * ratio);
+    QRect chartArea(CHART_LEFT, CHART_TOP, pixmapSize.width() - CHART_LEFT - CHART_RIGHT,
+                    pixmapSize.height() - CHART_TOP - CHART_BOTTOM);
+
+    if (!chartDataBounds(&minYear, &maxYear, &minValue, &maxValue)) {
+        clearChart();
+        return;
+    }
+
+    minValue = paddedMin(context.metrics.min, context.metrics.max);
+    maxValue = paddedMax(context.metrics.min, context.metrics.max);
+
+    pixmap.setDevicePixelRatio(ratio);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    drawChartAxes(&painter, chartArea, minYear, maxYear, minValue, maxValue);
+    drawChartMetrics(&painter, chartArea, &context.metrics, minValue, maxValue);
+    drawChartPolyline(&painter, context.chartPoints, chartArea, minYear, maxYear, minValue, maxValue);
+    ui->chartLabel->setPixmap(pixmap);
+    ui->ChartStackedWidget->setCurrentWidget(ui->chartPage);
 }
 
 QString MainWindow::statusText(Status status) const {
@@ -376,8 +576,10 @@ void MainWindow::loadDataClicked() {
 
     if (context.status == OK)
         fillTable(ui->regionComboBox->currentText().trimmed());
-    else
+    else {
         clearMetricFields();
+        clearChart();
+    }
 
 }
 
@@ -388,20 +590,26 @@ void MainWindow::calculateMetricsClicked() {
     params.str = region.c_str();
     params.column = selectedColumn();
 
-    doOperation(CALCULATE_METRICS, &context, &params);
+    doOperation(CALCULATE_AND_DRAW, &context, &params);
     statusBar()->showMessage(statusText(context.status), STATUS_BAR_MESSAGE_TIMEOUT_MS);
 
     if (context.status == OK) {
         ui->minValueLineEdit->setText(QString::number(context.metrics.min));
         ui->medianValueLineEdit->setText(QString::number(context.metrics.median));
         ui->maxValueLineEdit->setText(QString::number(context.metrics.max));
-    } else
+        drawChart();
+    } else {
         clearMetricFields();
+        clearChart();
+    }
 }
 
 void MainWindow::regionEditingFinished() {
-    if (hasLoadedData())
+    if (hasLoadedData()) {
         fillTable(ui->regionComboBox->currentText().trimmed());
+        clearMetricFields();
+        clearChart();
+    }
 }
 
 void MainWindow::tableItemDoubleClicked(QTableWidgetItem *item) {

@@ -5,6 +5,7 @@ extern "C" {
 #include "entrypoint.h"
 #include "iterator.h"
 #include "appcontext.h"
+#include "chart_data.h"
 }
 
 #include <QMainWindow>
@@ -45,6 +46,7 @@ private:
     void setupConnections();
     void setupDragAndDrop();
     void setupTable();
+    void setupChart();
     void setupColumnComboBox();
     void setupRegionComboBox();
     void reloadRegionComboBox();
@@ -61,6 +63,9 @@ private:
     void fillTable(const QString& regionFilter);
     void fillTableRow(int row, const DemographyRecord* record, const QString& recordRegion);
     void clearMetricFields();
+    void clearChart();
+    void drawChart();
+    int chartDataBounds(int* minYear, int* maxYear, double* minValue, double* maxValue) const;
     void showLoadSummary();
     QString statusText(Status status) const;
 };
