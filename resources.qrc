@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>icons/calculate.svg</file>
+        <file>icons/CSV.svg</file>
+        <file>icons/downloadFile.svg</file>
+        <file>icons/max.svg</file>
+        <file>icons/median.svg</file>
+        <file>icons/min.svg</file>
+        <file>icons/region.svg</file>
+        <file>icons/selectFile.svg</file>
+        <file>icons/table.svg</file>
+        <file>icons/info.svg</file>
+    </qresource>
+</RCC>

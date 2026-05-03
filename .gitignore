@@ -1,0 +1,34 @@
+classmate_repo/
+# Build folders
+build/
+build-*/
+
+# Qt Creator user files
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+
+# Qt Creator / IDE
+.qtcreator/
+.qtc_clangd/
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.a
+*.lib
+
+# Qt generated files
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+
+# Debug/release folders
+debug/
+release/
