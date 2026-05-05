@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-typedef struct Iterator {
+typedef struct {
     Node* current;
 } Iterator;
 

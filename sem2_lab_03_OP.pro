@@ -10,6 +10,8 @@ CONFIG += c++17
 
 SOURCES += \
     chart_data.c \
+    drag_and_drop.cpp \
+    draw.cpp \
     entrypoint.c \
     file_loader.c \
     iterator.c \
@@ -24,6 +26,7 @@ HEADERS += \
     appcontext.h \
     chart_data.h \
     demography_record.h \
+    draw.h \
     entrypoint.h \
     file_loader.h \
     iterator.h \
