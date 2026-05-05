@@ -13,6 +13,13 @@ typedef struct {
     double value;
 } ChartPoint;
 
+typedef struct {
+    int minYear;
+    int maxYear;
+    double minValue;
+    double maxValue;
+} ChartValues;
+
 Status validateNumericColumn(Column column);
 double getColumnValue(const DemographyRecord* record, Column column);
 Status pushChartPointValueSorted(List* points, int year, double value);

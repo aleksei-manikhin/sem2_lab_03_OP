@@ -65,7 +65,7 @@ private:
     void clearMetricFields();
     void clearChart();
     void drawChart();
-    int chartDataBounds(int* minYear, int* maxYear, double* minValue, double* maxValue) const;
+    int chartDataBounds(ChartValues* values) const;
     void showLoadSummary();
     QString statusText(Status status) const;
 };

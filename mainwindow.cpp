@@ -45,16 +45,12 @@ enum {
 QSize chartPixmapSize(const QLabel* label);
 double paddedMin(double minValue, double maxValue);
 double paddedMax(double minValue, double maxValue);
-QPoint chartPointToScreen(const ChartPoint* point, const QRect& area,
-                          int minYear, int maxYear, double minValue, double maxValue);
-void drawChartAxes(QPainter* painter, const QRect& area,
-                   int minYear, int maxYear, double minValue, double maxValue);
-void drawChartPolyline(QPainter* painter, const List* points, const QRect& area,
-                       int minYear, int maxYear, double minValue, double maxValue);
-void drawMetricLine(QPainter* painter, const QRect& area, double value,
-                    double minValue, double maxValue, const QString& label);
-void drawChartMetrics(QPainter* painter, const QRect& area,
-                      const Metrics* metrics, double minValue, double maxValue);
+void applyChartPadding(ChartValues* values);
+QPoint chartPointToScreen(const ChartPoint* point, const QRect& area, const ChartValues* values);
+void drawChartAxes(QPainter* painter, const QRect& area, const ChartValues* values);
+void drawChartPolyline(QPainter* painter, const List* points, const QRect& area, const ChartValues* values);
+void drawMetricLine(QPainter* painter, const QRect& area, double value, const ChartValues* values, const QString& label);
+void drawChartMetrics(QPainter* painter, const QRect& area, const Metrics* metrics, const ChartValues* values);
 
 QSize chartPixmapSize(const QLabel* label) {
     QSize size = label->size();
@@ -81,19 +77,25 @@ double paddedMax(double minValue, double maxValue) {
     return maxValue + padding;
 }
 
-QPoint chartPointToScreen(const ChartPoint* point, const QRect& area,
-                          int minYear, int maxYear, double minValue, double maxValue) {
-    double yearSpan = maxYear - minYear;
-    double valueSpan = maxValue - minValue;
-    double xRate = yearSpan == 0.0 ? 0.5 : (point->year - minYear + 0.5) / (yearSpan + 1.0);
-    double yRate = valueSpan == 0.0 ? 0.5 : (point->value - minValue) / valueSpan;
+void applyChartPadding(ChartValues* values) {
+    double minValue = values->minValue;
+    double maxValue = values->maxValue;
+
+    values->minValue = paddedMin(minValue, maxValue);
+    values->maxValue = paddedMax(minValue, maxValue);
+}
+
+QPoint chartPointToScreen(const ChartPoint* point, const QRect& area, const ChartValues* values) {
+    double yearSpan = values->maxYear - values->minYear;
+    double valueSpan = values->maxValue - values->minValue;
+    double xRate = yearSpan == 0.0 ? 0.5 : (point->year - values->minYear + 0.5) / (yearSpan + 1.0);
+    double yRate = valueSpan == 0.0 ? 0.5 : (point->value - values->minValue) / valueSpan;
 
     return QPoint(area.left() + xRate * area.width(),
                   area.bottom() - yRate * area.height());
 }
 
-void drawChartAxes(QPainter* painter, const QRect& area,
-                   int minYear, int maxYear, double minValue, double maxValue) {
+void drawChartAxes(QPainter* painter, const QRect& area, const ChartValues* values) {
     QFont font = painter->font();
 
     font.setPointSize(CHART_AXIS_FONT_SIZE);
@@ -102,16 +104,16 @@ void drawChartAxes(QPainter* painter, const QRect& area,
     painter->setPen(QPen(QColor("#253247"), 2));
     painter->drawLine(area.bottomLeft(), area.bottomRight());
     painter->drawLine(area.bottomLeft(), area.topLeft());
-    painter->drawText(area.left(), area.bottom() + 25, QString::number(minYear));
-    painter->drawText(area.right() - 35, area.bottom() + 25, QString::number(maxYear));
-    painter->drawText(12, area.top() + 5, QString::number(maxValue, 'f', 2));
-    painter->drawText(12, area.bottom(), QString::number(minValue, 'f', 2));
+    painter->drawText(area.left(), area.bottom() + 25, QString::number(values->minYear));
+    painter->drawText(area.right() - 35, area.bottom() + 25, QString::number(values->maxYear));
+    painter->drawText(12, area.top() + 5, QString::number(values->maxValue, 'f', 2));
+    painter->drawText(12, area.bottom(), QString::number(values->minValue, 'f', 2));
     painter->drawText(area.center().x() - 20, area.bottom() + 45, "Year");
     painter->drawText(area.left() - 55, area.top() - 12, "Value");
 }
 
 void drawChartPolyline(QPainter* painter, const List* points, const QRect& area,
-                       int minYear, int maxYear, double minValue, double maxValue) {
+                       const ChartValues* values) {
     Iterator it = begin(points);
     QPoint prevPoint;
     int hasPrevPoint = 0;
@@ -119,7 +121,7 @@ void drawChartPolyline(QPainter* painter, const List* points, const QRect& area,
     painter->setPen(QPen(QColor("#1d4fc0"), 3));
     while (isSet(&it)) {
         ChartPoint* chartPoint = (ChartPoint*)get(&it);
-        QPoint screenPoint = chartPointToScreen(chartPoint, area, minYear, maxYear, minValue, maxValue);
+        QPoint screenPoint = chartPointToScreen(chartPoint, area, values);
         if (hasPrevPoint)
             painter->drawLine(prevPoint, screenPoint);
         painter->setBrush(QColor("#17c2c2"));
@@ -131,9 +133,9 @@ void drawChartPolyline(QPainter* painter, const List* points, const QRect& area,
 }
 
 void drawMetricLine(QPainter* painter, const QRect& area, double value,
-                    double minValue, double maxValue, const QString& label) {
-    double valueSpan = maxValue - minValue;
-    double yRate = valueSpan == 0.0 ? 0.5 : (value - minValue) / valueSpan;
+                    const ChartValues* values, const QString& label) {
+    double valueSpan = values->maxValue - values->minValue;
+    double yRate = valueSpan == 0.0 ? 0.5 : (value - values->minValue) / valueSpan;
     int y = area.bottom() - yRate * area.height();
     QFont font = painter->font();
 
@@ -146,10 +148,10 @@ void drawMetricLine(QPainter* painter, const QRect& area, double value,
 }
 
 void drawChartMetrics(QPainter* painter, const QRect& area,
-                      const Metrics* metrics, double minValue, double maxValue) {
-    drawMetricLine(painter, area, metrics->min, minValue, maxValue, "Min");
-    drawMetricLine(painter, area, metrics->median, minValue, maxValue, "Median");
-    drawMetricLine(painter, area, metrics->max, minValue, maxValue, "Max");
+                      const Metrics* metrics, const ChartValues* values) {
+    drawMetricLine(painter, area, metrics->min, values, "Min");
+    drawMetricLine(painter, area, metrics->median, values, "Median");
+    drawMetricLine(painter, area, metrics->max, values, "Max");
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -403,20 +405,20 @@ void MainWindow::clearChart() {
     ui->ChartStackedWidget->setCurrentWidget(ui->chartEmptyPage);
 }
 
-int MainWindow::chartDataBounds(int* minYear, int* maxYear, double* minValue, double* maxValue) const {
+int MainWindow::chartDataBounds(ChartValues* values) const {
     Iterator it = begin(context.chartPoints);
     int hasPoints = 0;
 
     while (isSet(&it)) {
         ChartPoint* point = (ChartPoint*)get(&it);
-        if (!hasPoints || point->year < *minYear)
-            *minYear = point->year;
-        if (!hasPoints || point->year > *maxYear)
-            *maxYear = point->year;
-        if (!hasPoints || point->value < *minValue)
-            *minValue = point->value;
-        if (!hasPoints || point->value > *maxValue)
-            *maxValue = point->value;
+        if (!hasPoints || point->year < values->minYear)
+            values->minYear = point->year;
+        if (!hasPoints || point->year > values->maxYear)
+            values->maxYear = point->year;
+        if (!hasPoints || point->value < values->minValue)
+            values->minValue = point->value;
+        if (!hasPoints || point->value > values->maxValue)
+            values->maxValue = point->value;
         hasPoints = 1;
         next(&it);
     }
@@ -425,31 +427,29 @@ int MainWindow::chartDataBounds(int* minYear, int* maxYear, double* minValue, do
 }
 
 void MainWindow::drawChart() {
-    int minYear = 0;
-    int maxYear = 0;
-    double minValue = 0.0;
-    double maxValue = 0.0;
+    ChartValues values = {0, 0, 0.0, 0.0};
     QSize pixmapSize = chartPixmapSize(ui->chartLabel);
     double ratio = ui->chartLabel->devicePixelRatioF();
     QPixmap pixmap(pixmapSize * ratio);
     QRect chartArea(CHART_LEFT, CHART_TOP, pixmapSize.width() - CHART_LEFT - CHART_RIGHT,
                     pixmapSize.height() - CHART_TOP - CHART_BOTTOM);
 
-    if (!chartDataBounds(&minYear, &maxYear, &minValue, &maxValue)) {
+    if (!chartDataBounds(&values)) {
         clearChart();
         return;
     }
 
-    minValue = paddedMin(context.metrics.min, context.metrics.max);
-    maxValue = paddedMax(context.metrics.min, context.metrics.max);
+    values.minValue = context.metrics.min;
+    values.maxValue = context.metrics.max;
+    applyChartPadding(&values);
 
     pixmap.setDevicePixelRatio(ratio);
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
-    drawChartAxes(&painter, chartArea, minYear, maxYear, minValue, maxValue);
-    drawChartMetrics(&painter, chartArea, &context.metrics, minValue, maxValue);
-    drawChartPolyline(&painter, context.chartPoints, chartArea, minYear, maxYear, minValue, maxValue);
+    drawChartAxes(&painter, chartArea, &values);
+    drawChartMetrics(&painter, chartArea, &context.metrics, &values);
+    drawChartPolyline(&painter, context.chartPoints, chartArea, &values);
     ui->chartLabel->setPixmap(pixmap);
     ui->ChartStackedWidget->setCurrentWidget(ui->chartPage);
 }
