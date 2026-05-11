@@ -12,6 +12,7 @@
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QTableWidgetItem>
+#include <QToolButton>
 
 #include <string>
 
@@ -48,7 +49,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::setupConnections() {
-    connect(ui->chooseFileButton, &QPushButton::clicked, this, &MainWindow::chooseFileClicked);
+    connect(ui->icon_4, &QToolButton::clicked, this, &MainWindow::chooseFileClicked);
     connect(ui->calculateMetricsButton, &QPushButton::clicked, this, &MainWindow::calculateMetricsClicked);
     connect(ui->regionComboBox, QOverload<int>::of(&QComboBox::activated),this, &MainWindow::regionEditingFinished);
     connect(ui->regionComboBox->lineEdit(), &QLineEdit::editingFinished,this, &MainWindow::regionEditingFinished);
