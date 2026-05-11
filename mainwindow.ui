@@ -43,20 +43,25 @@ QMenuBar {
     border: none;
 }
 
-QPushButton#chooseFileButton {
-    background: #ffffff;
-    color: #2c3f59;
-    border: 2px solid #93a8c6;
-    border-radius: 14px;
-    padding: 8px 16px;
-}
-QPushButton#chooseFileButton:hover { background: #f5f9ff; }
-QPushButton#chooseFileButton:pressed { background: #eaf2ff; }
-
 QWidget#fileWidget {
     background: rgba(255,255,255,0.7);
     border: 2px solid #cfd8e6;
     border-radius: 14px;
+}
+
+QToolButton#icon_2 {
+    background: rgba(255,255,255,0.65);
+    border: 1px solid #93a8c6;
+    border-radius: 10px;
+    padding: 4px;
+}
+QToolButton#icon_2:hover {
+    background: #f5f9ff;
+    border: 2px solid #5cc7cb;
+}
+QToolButton#icon_2:pressed {
+    background: #eaf2ff;
+    border: 2px solid #2f67d2;
 }
 
 QLineEdit#filePathLineEdit {
@@ -96,8 +101,7 @@ QComboBox#columnComboBox:focus {
 }
 
 
-QPushButton#loadDataButton,
-QPushButton#calculateMetricsButton {
+QPushButton#loadDataButton {
     color: #ffffff;
     border: none;
     border-radius: 14px;
@@ -112,17 +116,6 @@ QPushButton#loadDataButton:pressed { background: #0d99a8; }
 QPushButton#loadDataButton:disabled {
     background: #cfd4dd;
     color: #f6f7f9;
-}
-
-QPushButton#calculateMetricsButton {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                                stop:0 #2f67d2, stop:1 #1d4fc0);
-}
-QPushButton#calculateMetricsButton:hover { background: #275cc8; }
-QPushButton#calculateMetricsButton:pressed { background: #214fb0; }
-QPushButton#calculateMetricsButton:disabled {
-    background: #c9ced9;
-    color: #eef0f4;
 }
 
 QStackedWidget#contentStackedWidget {
@@ -283,7 +276,7 @@ QStatusBar QLabel {
          <item>
           <widget class="QToolButton" name="icon_2">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>...</string>
@@ -585,7 +578,7 @@ QStatusBar QLabel {
              <bool>true</bool>
             </property>
             <property name="text">
-             <string>Push an icon or pull your file!</string>
+             <string>Pull your file!</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -773,7 +766,7 @@ QStatusBar QLabel {
                 </font>
                </property>
                <property name="text">
-                <string>Select file, choose region and column, then click &quot;Calculate and Draw&quot;</string>
+                <string>Select file, choose region and column</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -1147,50 +1140,6 @@ QStatusBar QLabel {
           </widget>
          </item>
         </layout>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Policy::Expanding</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="calculateMetricsButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>178</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>Calculate and Draw</string>
-        </property>
        </widget>
       </item>
       <item>

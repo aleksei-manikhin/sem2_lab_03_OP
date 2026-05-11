@@ -40,6 +40,7 @@ private:
     void loadDataClicked();
     void calculateMetricsClicked();
     void regionEditingFinished();
+    void columnEditingFinished();
     void tableItemDoubleClicked(QTableWidgetItem *item);
 
     Ui::MainWindow *ui;

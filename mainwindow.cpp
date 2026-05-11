@@ -49,12 +49,13 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::setupConnections() {
+    ui->icon_2->setCursor(Qt::PointingHandCursor);
+    ui->icon_4->setCursor(Qt::PointingHandCursor);
+    connect(ui->icon_2, &QToolButton::clicked, this, &MainWindow::chooseFileClicked);
     connect(ui->icon_4, &QToolButton::clicked, this, &MainWindow::chooseFileClicked);
-    connect(ui->calculateMetricsButton, &QPushButton::clicked, this, &MainWindow::calculateMetricsClicked);
     connect(ui->regionComboBox, QOverload<int>::of(&QComboBox::activated),this, &MainWindow::regionEditingFinished);
     connect(ui->regionComboBox->lineEdit(), &QLineEdit::editingFinished,this, &MainWindow::regionEditingFinished);
-    connect(ui->columnComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::clearMetricFields);
-    connect(ui->columnComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::clearChart);
+    connect(ui->columnComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::columnEditingFinished);
     connect(ui->tableWidget, &QTableWidget::itemDoubleClicked, this, &MainWindow::tableItemDoubleClicked);
 }
 
@@ -67,7 +68,6 @@ void MainWindow::setupTable() {
 
 void MainWindow::setupColumnComboBox() {
     ui->columnComboBox->clear();
-    ui->columnComboBox->addItem("Year", YEAR);
     ui->columnComboBox->addItem("Growth", NPG);
     ui->columnComboBox->addItem("Birth", BIRTH_RATE);
     ui->columnComboBox->addItem("Death", DEATH_RATE);
@@ -142,7 +142,6 @@ int MainWindow::hasLoadedData() const {
 
 void MainWindow::setLoadedState() {
     int isLoaded = hasLoadedData();
-    ui->calculateMetricsButton->setEnabled(isLoaded);
     ui->contentStackedWidget->setCurrentWidget(isLoaded ? ui->tablePage : ui->emptyPage);
     if (!isLoaded)
         ui->tableWidget->setRowCount(0);
@@ -290,6 +289,12 @@ void MainWindow::calculateMetricsClicked() {
     AppParams params;
     std::string region = ui->regionComboBox->currentText().trimmed().toStdString();
 
+    if (!hasLoadedData() || region.empty()) {
+        clearMetricFields();
+        clearChart();
+        return;
+    }
+
     params.str = region.c_str();
     params.column = selectedColumn();
 
@@ -310,9 +315,14 @@ void MainWindow::calculateMetricsClicked() {
 void MainWindow::regionEditingFinished() {
     if (hasLoadedData()) {
         fillTable(ui->regionComboBox->currentText().trimmed());
-        clearMetricFields();
-        clearChart();
+        calculateMetricsClicked();
     }
+}
+
+void MainWindow::columnEditingFinished() {
+    clearMetricFields();
+    clearChart();
+    calculateMetricsClicked();
 }
 
 void MainWindow::tableItemDoubleClicked(QTableWidgetItem *item) {
