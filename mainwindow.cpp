@@ -52,10 +52,8 @@ void MainWindow::setupConnections() {
     connect(ui->calculateMetricsButton, &QPushButton::clicked, this, &MainWindow::calculateMetricsClicked);
     connect(ui->regionComboBox, QOverload<int>::of(&QComboBox::activated),this, &MainWindow::regionEditingFinished);
     connect(ui->regionComboBox->lineEdit(), &QLineEdit::editingFinished,this, &MainWindow::regionEditingFinished);
-    connect(ui->columnComboBox, QOverload<int>::of(&QComboBox::activated), this, [this]() {
-        clearMetricFields();
-        clearChart();
-    });
+    connect(ui->columnComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::clearMetricFields);
+    connect(ui->columnComboBox, QOverload<int>::of(&QComboBox::activated), this, &MainWindow::clearChart);
     connect(ui->tableWidget, &QTableWidget::itemDoubleClicked, this, &MainWindow::tableItemDoubleClicked);
 }
 

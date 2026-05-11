@@ -8,6 +8,8 @@ extern "C" {
 #include "chart_data.h"
 }
 
+#include "draw.h"
+
 #include <QMainWindow>
 #include <QString>
 #include <QTableWidgetItem>
@@ -65,7 +67,7 @@ private:
     void clearMetricFields();
     void clearChart();
     void drawChart();
-    int chartDataBounds(ChartValues* values) const;
+    int chartDataBounds(ChartData* chartData) const;
     void showLoadSummary();
     QString statusText(Status status) const;
 };

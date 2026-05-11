@@ -1,6 +1,10 @@
 #ifndef DRAW_H
 #define DRAW_H
 
+#include <QPainter>
+#include <QPoint>
+#include <QRect>
+
 enum {
     CHART_DEFAULT_WIDTH = 760,
     CHART_DEFAULT_HEIGHT = 460,
@@ -32,5 +36,20 @@ enum {
     CHART_METRIC_TEXT_OFFSET_X = 8,
     CHART_METRIC_TEXT_OFFSET_Y = 4
 };
+
+typedef QPoint Point;
+
+typedef struct {
+    int minYear;
+    int maxYear;
+    double minValue;
+    double maxValue;
+    double yearSpan;
+    double valueSpan;
+    QPainter* painter;
+    const QRect* area;
+    Point screenPoint;
+    Point previousScreenPoint;
+} ChartData;
 
 #endif // DRAW_H
