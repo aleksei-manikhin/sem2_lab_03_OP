@@ -45,6 +45,7 @@ private:
 
     Ui::MainWindow *ui;
     AppContext context;
+    QString selectedFilePath;
 
     void setupConnections();
     void setupDragAndDrop();

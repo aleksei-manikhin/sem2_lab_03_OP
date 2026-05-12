@@ -43,39 +43,6 @@ QMenuBar {
     border: none;
 }
 
-QWidget#fileWidget {
-    background: rgba(255,255,255,0.7);
-    border: 2px solid #cfd8e6;
-    border-radius: 14px;
-}
-
-QToolButton#icon_2 {
-    background: rgba(255,255,255,0.65);
-    border: 1px solid #93a8c6;
-    border-radius: 10px;
-    padding: 4px;
-}
-QToolButton#icon_2:hover {
-    background: #f5f9ff;
-    border: 2px solid #5cc7cb;
-}
-QToolButton#icon_2:pressed {
-    background: #eaf2ff;
-    border: 2px solid #2f67d2;
-}
-
-QLineEdit#filePathLineEdit {
-    background: transparent;
-    border: none;
-    color: #33465f;
-    padding: 0 10px;
-    selection-background-color: #2f62c7;
-    selection-color: #ffffff;
-}
-QLineEdit#filePathLineEdit:read-only {
-    color: #3b4e66;
-}
-
 QFrame#regionFrame, QFrame#columnFrame {
     background: rgba(255,255,255,0.7);
     border: 2px solid #6ac8cc;
@@ -268,64 +235,6 @@ QStatusBar QLabel {
     </size>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_9">
-    <item>
-     <layout class="QHBoxLayout" name="fileRowLayout">
-      <item>
-       <widget class="QWidget" name="fileWidget" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QToolButton" name="icon_2">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>...</string>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normalon>:/icons/icons/CSV.svg</normalon>
-            </iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="autoRaise">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="filePathLineEdit">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>35</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>9</pointsize>
-            </font>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-           <property name="placeholderText">
-            <string>The file was not selected</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </item>
     <item>
      <layout class="QHBoxLayout" name="controlRowLayout" stretch="0,0">
       <item>

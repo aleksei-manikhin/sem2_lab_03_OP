@@ -49,9 +49,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::setupConnections() {
-    ui->icon_2->setCursor(Qt::PointingHandCursor);
     ui->icon_4->setCursor(Qt::PointingHandCursor);
-    connect(ui->icon_2, &QToolButton::clicked, this, &MainWindow::chooseFileClicked);
     connect(ui->icon_4, &QToolButton::clicked, this, &MainWindow::chooseFileClicked);
     connect(ui->regionComboBox, QOverload<int>::of(&QComboBox::activated),this, &MainWindow::regionEditingFinished);
     connect(ui->regionComboBox->lineEdit(), &QLineEdit::editingFinished,this, &MainWindow::regionEditingFinished);
@@ -113,7 +111,7 @@ void MainWindow::reloadRegionComboBox() {
 void MainWindow::selectFile(const QString& filePath) {
     if (!filePath.isEmpty()) {
         unloadData();
-        ui->filePathLineEdit->setText(filePath);
+        selectedFilePath = filePath;
         loadDataClicked();
     }
 }
@@ -265,7 +263,7 @@ void MainWindow::chooseFileClicked() {
 
 void MainWindow::loadDataClicked() {
     AppParams params;
-    std::string filePath = ui->filePathLineEdit->text().toStdString();
+    std::string filePath = selectedFilePath.toStdString();
 
     params.str = filePath.c_str();
     params.column = YEAR;
